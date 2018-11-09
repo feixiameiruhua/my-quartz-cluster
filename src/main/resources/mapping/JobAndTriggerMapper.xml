@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fwmagic.quartz.mapper.JobAndTriggerMapper">
+
+    <select id="getJobAndTriggerDetails" resultType="com.fwmagic.quartz.entity.ScheduleJob">
+        SELECT
+        qrtz_job_details.JOB_NAME,
+        qrtz_job_details.JOB_GROUP,
+        qrtz_job_details.JOB_CLASS_NAME,
+        qrtz_triggers.TRIGGER_NAME,
+        qrtz_triggers.TRIGGER_GROUP,
+        qrtz_triggers.TRIGGER_STATE,
+        qrtz_cron_triggers.CRON_EXPRESSION,
+        qrtz_cron_triggers.TIME_ZONE_ID
+        FROM
+        quartz_test.qrtz_cron_triggers,
+        quartz_test.qrtz_job_details,
+        quartz_test.qrtz_triggers
+        WHERE
+        qrtz_cron_triggers.TRIGGER_NAME = qrtz_job_details.JOB_NAME
+        AND qrtz_job_details.JOB_NAME = qrtz_triggers.JOB_NAME
+        <if test="scheduleJob.jobGroup!=null">
+            AND qrtz_job_details.JOB_GROUP like CONCAT('%',#{scheduleJob.jobGroup},'%')
+        </if>
+        <if test="scheduleJob.triggerName!=null">
+            AND qrtz_triggers.TRIGGER_NAME like CONCAT('%',#{scheduleJob.triggerName},'%')
+        </if>
+        <if test="scheduleJob.triggerGroup!=null">
+            AND qrtz_triggers.TRIGGER_GROUP like CONCAT('%',#{scheduleJob.triggerGroup},'%')
+        </if>
+        <if test="scheduleJob.triggerState!=null">
+            AND qrtz_triggers.TRIGGER_STATE like CONCAT('%',#{scheduleJob.triggerState},'%')
+        </if>
+        <if test="scheduleJob.cronExpression!=null">
+            AND qrtz_cron_triggers.CRON_EXPRESSION like CONCAT('%',#{scheduleJob.cronExpression},'%')
+        </if>
+        ORDER BY
+        qrtz_cron_triggers.TRIGGER_NAME
+    </select>
+
+</mapper>
